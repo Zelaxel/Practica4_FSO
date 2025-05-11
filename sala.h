@@ -29,3 +29,6 @@ int crea_sala(int capacidad);
 // Libera el espacio reservado para la sala y devuelve 0 si todo va bien.
 // Da -1 si no hay sala.
 int elimina_sala();
+
+// Imprime los asientos.
+void comprobar_asientos();

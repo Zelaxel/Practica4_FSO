@@ -97,3 +97,19 @@ int elimina_sala(){
     return 0;
 }
 
+void comprobar_asientos(){
+	if (sala_teatro == NULL) {
+		fprintf(stderr, "La sala no está creada.\n");
+		return;
+	}
+	printf("Asientos totales: %d\nAsientos ocupados: %d\nAsientos libres: %d\n",
+		   capacidad_sala(), asientos_ocupados(), asientos_libres());
+	for (int i = 0; i < capacidad_total; i++) {
+		if (sala_teatro[i] == -1) {
+			printf("Asiento %3dº: Libre\n", i);
+		} else {
+			printf("Asiento %3dº: Ocupado por %d\n", i, sala_teatro[i]);
+		}
+	}
+}
+
