@@ -30,6 +30,7 @@ void* ejecucion(void* n){
 		// Reservamos i+1 por que los id de usuario no pueden ser < 1.
 		if((asientos[i] = reserva_asiento(i+1)) == -1){ // Error al reservar.
 			fprintf(stderr, "Error. No quedan asientos libres.\n");
+			break;
 		}
 		pausa_aleatoria(pausa);
 	}
