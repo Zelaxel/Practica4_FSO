@@ -5,7 +5,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define capacidad 10
 #define pausa 4
 
 int terminado = 0;
@@ -57,13 +56,14 @@ int main(int argn, char* argv[]){
 		exit(-1);
 	}
 	
+	int N = atoi(argv[1]); //Número de hilos a lanzar.
+	
 	// Creamos la sala.
-	if(crea_sala(capacidad) == -1){ // Error crear sala.
-		fprintf(stderr, "Error al crear la sala.");
+	if(crea_sala(N*3) == -1){ // Error crear sala.
+		fprintf(stderr, "Error al crear la sala.\n");
 		exit(-1);
 	}
 	
-	int N = atoi(argv[1]); //Número de hilos a lanzar.
 	pthread_t hilos[N]; // Hilos.
 	pthread_t hilo_estado; // Hilo que imprime la sala.
 	
