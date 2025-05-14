@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define pausa 4
+#define pausa 0.1
 
 int terminado = 0;
 
@@ -84,6 +84,8 @@ int main(int argn, char* argv[]){
 	}
 	terminado = 1;
 	pthread_join(hilo_estado, &dummy);
+	
+	elimina_sala();
 	
 	exit(0); // Salida con exito.
 }
