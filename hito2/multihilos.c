@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define pausa 0.1
+#define pausa 0.5
 
 int terminado = 0;
 
@@ -63,7 +63,7 @@ int main(int argn, char* argv[]){
 	int N = atoi(argv[1]); //Número de hilos a lanzar.
 
 	// Creamos la sala.
-	if(crea_sala(N*3) == -1){ // Error crear sala.
+	if(crea_sala(20) == -1){ // Error crear sala.
 		fprintf(stderr, "Error al crear la sala.\n");
 		exit(-1);
 	}
@@ -86,6 +86,8 @@ int main(int argn, char* argv[]){
 	pthread_join(hilo_estado, &dummy);
 
 	elimina_sala();
+	
+	printf("Simulación terminada.\n");
 
 	exit(0); // Salida con exito.
 }
