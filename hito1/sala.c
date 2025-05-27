@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "retardo.h"
 
-#define pausa 0.5
+#define pausa 2 // Tiempo aleatorio de pausa. 
 
 int* sala_teatro = NULL;
 int capacidad_total = 0;
@@ -31,7 +31,7 @@ int libera_asiento(int id_asiento){
 
 	//Hay asiento por lo que lo libera.
 	int id_persona = sala_teatro[id_asiento];
-	sala_teatro[id_asiento]=-1;
+	sala_teatro[id_asiento] = -1;
 	return id_persona;
 
 }
