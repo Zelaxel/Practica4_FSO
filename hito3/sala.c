@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include "retardo.h"
 
-#define pausa 2
+#define pausa 1
 
 int* sala_teatro = NULL;
 int capacidad_total = 0;
@@ -54,31 +54,11 @@ int capacidad_sala(){
     return capacidad_total;
 }
 
-int reserva_asiento(int id_persona){
-	//Falla si la sala no esta creada o si el id de la persona no es valido.
-	if(sala_teatro==NULL || id_persona < 1) return -1;
-	
-	// Espera a que existan espacios para reservar.
-	while(asientos_libres() == 0){
-		pthread_cond_wait(&reserva, &cerrojo);
-	}
-
-	// Busca un espacio libre.
-	for(int i = 0; i < capacidad_total; i++){
-		if(sala_teatro[i] == -1){
-			pthread_mutex_lock(&cerrojo);
-			sala_teatro[i] = id_persona;
-			pthread_cond_signal(&libera);  // Notifica a hilos que quieran liberar
-			pthread_mutex_unlock(&cerrojo);
-			return i;
-		}
-	}
-	return -1; // No hay asientos por reservar.
-}
-
 int libera_asiento(){
 	// Falla si la sala no esta creada.
 	if(sala_teatro==NULL) return -1;
+	
+	pthread_mutex_lock(&cerrojo);
 	
 	// Espera a que existan expacios para liberar.
 	while(asientos_ocupados() == 0){
@@ -88,15 +68,41 @@ int libera_asiento(){
 	// Busca un espacio ocupado.
 	for(int i = 0; i < capacidad_total; i++){
 		if(sala_teatro[i] != -1){
-			pthread_mutex_lock(&cerrojo);
+			pausa_aleatoria(pausa);
 			sala_teatro[i] = -1;
 			pthread_cond_signal(&reserva);  // Notifica a hilos que quieran reservar.
 			pthread_mutex_unlock(&cerrojo);
 			return i;
 		}
 	}
-	
+	pthread_mutex_unlock(&cerrojo);
 	return -1; // No hay asientos por liberar.
+}
+
+int reserva_asiento(int id_persona){
+	//Falla si la sala no esta creada o si el id de la persona no es valido.
+	if(sala_teatro==NULL || id_persona < 1) return -1;
+
+	pausa_aleatoria(pausa);
+	pthread_mutex_lock(&cerrojo);
+	
+	// Espera a que existan espacios para reservar.
+	while(asientos_libres() == 0){
+		pthread_cond_wait(&reserva, &cerrojo);
+	}
+
+	// Busca un espacio libre.
+	for(int i = 0; i < capacidad_total; i++){
+		if(sala_teatro[i] == -1){
+			pausa_aleatoria(pausa);
+			sala_teatro[i] = id_persona;
+			pthread_cond_signal(&libera);  // Notifica a hilos que quieran liberar
+			pthread_mutex_unlock(&cerrojo);
+			return i;
+		}
+	}
+	pthread_mutex_unlock(&cerrojo);
+	return -1; // No hay asientos por reservar.
 }
 
 int crea_sala(int capacidad){

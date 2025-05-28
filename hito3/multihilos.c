@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define pausa 2
+#define pausa 1
 
 int terminado = 0;
 int asientos[20]; // Asientos por liberar.
