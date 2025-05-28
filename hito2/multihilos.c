@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define pausa 0.5
+#define pausa 2
 
 int terminado = 0;
 

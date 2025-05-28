@@ -5,9 +5,11 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#define pausa 0.5
+#define pausa 2
 
 int terminado = 0;
+int asientos[20]; // Asientos por liberar.
+int indice = 0; // Indice de asientos por liberar.
 
 // Muestra el estado de la sala cada cierto tiempo.
 void* estado(void* n){
@@ -21,46 +23,35 @@ void* estado(void* n){
 	printf("\n");
 }
 
-// Reserva y liberación de 3 asientos.
-void* ejecucion(void* n){
-
-	int asientos[3]; // ID de los asientos reservados.
-	int n_asientos_reservados = 0;
-
+// Hilo que reserva asientos.
+void* reservar(void* n){
 	// Reservamos 3 asientos.
 	for(int i=0; i<3; i++){
 		// Reservamos i+1 por que los id de usuario no pueden ser < 1.
-		if((asientos[i] = reserva_asiento(i+1)) == -1){ // Error al reservar.
+		if(reserva_asiento(i+1) == -1){ // Error al reservar.
 			fprintf(stderr, "Error. No quedan asientos libres.\n");
-			break;
 		}
-		n_asientos_reservados++;
 		pausa_aleatoria(pausa);
 	}
+}
 
+// Hilo que libera asientos.
+void* liberar(void* n){
 	// Reservamos 3 asientos.
-	int Error = 0;
-	for(int i=0; i<n_asientos_reservados; i++){
+	for(int i=0; i<3; i++){
 		// liberamos.
-		if((libera_asiento(asientos[i])) == -1) Error++; // En caso de error el progama continua hasta liberar los asientos.
+		if(libera_asiento() == -1){
+			fprintf(stderr, "Error. No hay asientos por liberar.\n");
+		}
 		pausa_aleatoria(pausa);
-	}
-
-	// En caso de que hubiera error al liberar.
-	if(Error){
-		fprintf(stderr, "Error al liberar %d asientos.\n", Error);
 	}
 }
 
 // Main que lanza N hilos.
 int main(int argn, char* argv[]){
 	// Comprobamos los argumentos.
-	if(argn != 2){ // Error argumentos.
-		fprintf(stderr, "Número de %d argumentos invalido. 1 requerido.\n", argn-1);
-		exit(-1);
-	}
-	if(argn != 3){
-		fprintf(stderr, "Uso: %s n m\n", argv[0]);
+	if(argn != 3){ // Error argumentos.
+		fprintf(stderr, "Número de %d argumentos invalido. 2 requeridos.\n", argn-1);
 		exit(-1);
 	}
 
@@ -73,25 +64,25 @@ int main(int argn, char* argv[]){
 		exit(-1);
 	}
 
-	pthread_t hilos_reserva[N]; // Hilos.
-	pthread_t hilos_liberacion[M];
+	pthread_t hilos_reserva[N]; // Hilos reserva.
+	pthread_t hilos_liberacion[M]; // Hilos liberar.
 	pthread_t hilo_estado; // Hilo que imprime la sala.
 
 	// Lanzamos los hilos.
 	pthread_create(&hilo_estado, NULL, estado, NULL);
-	for(int i=0; i<n; i++){
+	for(int i=0; i<N; i++){
 		pthread_create(&hilos_reserva[i], NULL, reservar, NULL);
 	}
-	for(int i=0; i<m; i++){
+	for(int i=0; i<M; i++){
 		pthread_create(&hilos_liberacion[i], NULL, liberar, NULL);
 	}
 
 	// Esperamos a que terminen los hilos.
 	void* dummy;
-	for(int i=0; i<n; i++){
+	for(int i=0; i<N; i++){
 		pthread_join(hilos_reserva[i], &dummy);
 	}
-	for(int i=0; i<m; i++){
+	for(int i=0; i<M; i++){
 		pthread_join(hilos_liberacion[i], &dummy);
 	}
 	terminado = 1;
