@@ -12,12 +12,11 @@ pthread_mutex_t cerrojo = PTHREAD_MUTEX_INITIALIZER;
 int reserva_asiento(int id_persona){
 	//Falla si la sala no esta creada o si el id de la persona no es valido.
 	if(sala_teatro==NULL || id_persona < 1) return -1;
-	
-	pausa_aleatoria(pausa);
 
 	//Busca un espacio libre.
 	for(int i=0; i<capacidad_total; i++){
 		if(sala_teatro[i] == -1){
+			pausa_aleatoria(pausa);
 			pthread_mutex_lock(&cerrojo);
 			sala_teatro[i] = id_persona;
 			pthread_mutex_unlock(&cerrojo);
