@@ -59,8 +59,13 @@ int main(int argn, char* argv[]){
 		fprintf(stderr, "Número de %d argumentos invalido. 1 requerido.\n", argn-1);
 		exit(-1);
 	}
+	if(argn != 3){
+		fprintf(stderr, "Uso: %s n m\n", argv[0]);
+		exit(-1);
+	}
 
 	int N = atoi(argv[1]); //Número de hilos a lanzar.
+	int M = atoi(argv[2]);
 
 	// Creamos la sala.
 	if(crea_sala(20) == -1){ // Error crear sala.
@@ -68,19 +73,26 @@ int main(int argn, char* argv[]){
 		exit(-1);
 	}
 
-	pthread_t hilos[N]; // Hilos.
+	pthread_t hilos_reserva[N]; // Hilos.
+	pthread_t hilos_liberacion[M];
 	pthread_t hilo_estado; // Hilo que imprime la sala.
 
 	// Lanzamos los hilos.
 	pthread_create(&hilo_estado, NULL, estado, NULL);
-	for(int i=0; i<N; i++){
-		pthread_create(&hilos[i], NULL, ejecucion, NULL);
+	for(int i=0; i<n; i++){
+		pthread_create(&hilos_reserva[i], NULL, reservar, NULL);
+	}
+	for(int i=0; i<m; i++){
+		pthread_create(&hilos_liberacion[i], NULL, liberar, NULL);
 	}
 
 	// Esperamos a que terminen los hilos.
 	void* dummy;
-	for(int i=0; i<N; i++){
-		pthread_join(hilos[i], &dummy);
+	for(int i=0; i<n; i++){
+		pthread_join(hilos_reserva[i], &dummy);
+	}
+	for(int i=0; i<m; i++){
+		pthread_join(hilos_liberacion[i], &dummy);
 	}
 	terminado = 1;
 	pthread_join(hilo_estado, &dummy);
