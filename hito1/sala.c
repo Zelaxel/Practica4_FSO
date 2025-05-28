@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "retardo.h"
 
-#define pausa 2
+#define pausa 1
 
 int* sala_teatro = NULL;
 int capacidad_total = 0;
