@@ -13,13 +13,16 @@ int indice = 0; // Indice de asientos por liberar.
 
 // Muestra el estado de la sala cada cierto tiempo.
 void* estado(void* n){
+	int iter = 0;
 	while(!terminado){
+		printf("\nVista %d\n", iter);
 		comprobar_asientos();
-		pausa_aleatoria(pausa);
 		printf("\n");
+		sleep(1);
+		iter++;
 	}
+	printf("\nVista %d\n", iter);
 	comprobar_asientos();
-	pausa_aleatoria(pausa);
 	printf("\n");
 }
 

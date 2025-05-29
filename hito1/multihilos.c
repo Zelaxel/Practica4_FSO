@@ -11,26 +11,28 @@ int terminado = 0;
 
 // Muestra el estado de la sala cada cierto tiempo.
 void* estado(void* n){
+	int iter = 0;
 	while(!terminado){
+		printf("\nVista %d\n", iter);
 		comprobar_asientos();
-		pausa_aleatoria(pausa);
 		printf("\n");
+		sleep(1);
+		iter++;
 	}
+	printf("\nVista %d\n", iter);
 	comprobar_asientos();
-	pausa_aleatoria(pausa);
 	printf("\n");
 }
 
 // Reserva y liberación de 3 asientos.
 void* ejecucion(void* n){
 
-	int asientos[3]; // ID de los asientos reservados.
 	int n_asientos_reservados = 0;
 
 	// Reservamos 3 asientos.
 	for(int i=0; i<3; i++){
 		// Reservamos i+1 por que los id de usuario no pueden ser < 1.
-		if((asientos[i] = reserva_asiento(i+1)) == -1){ // Error al reservar.
+		if(reserva_asiento(i+1) == -1){ // Error al reservar.
 			fprintf(stderr, "Error. No quedan asientos libres.\n");
 			break;
 		}
@@ -38,17 +40,13 @@ void* ejecucion(void* n){
 		pausa_aleatoria(pausa);
 	}
 
-	// Reservamos 3 asientos.
-	int Error = 0;
+	// Liberamos 3 asientos.
 	for(int i=0; i<n_asientos_reservados; i++){
 		// liberamos.
-		if((libera_asiento(asientos[i])) == -1) Error++; // En caso de error el progama continua hasta liberar los asientos.
+		if(libera_asiento() == -1){ // En caso de error el progama continua hasta liberar los asientos.
+			fprintf(stderr, "Error. No quedan asientos por liberar.\n");
+		}
 		pausa_aleatoria(pausa);
-	}
-
-	// En caso de que hubiera error al liberar.
-	if(Error){
-		fprintf(stderr, "Error al liberar %d asientos.\n", Error);
 	}
 }
 

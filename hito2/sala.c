@@ -13,32 +13,38 @@ int reserva_asiento(int id_persona){
 	//Falla si la sala no esta creada o si el id de la persona no es valido.
 	if(sala_teatro==NULL || id_persona < 1) return -1;
 
-	//Busca un espacio libre.
-	for(int i=0; i<capacidad_total; i++){
+	pthread_mutex_lock(&cerrojo);
+
+	// Busca un espacio libre.
+	for(int i = 0; i < capacidad_total; i++){
 		if(sala_teatro[i] == -1){
 			pausa_aleatoria(pausa);
-			pthread_mutex_lock(&cerrojo);
 			sala_teatro[i] = id_persona;
 			pthread_mutex_unlock(&cerrojo);
 			return i;
 		}
 	}
-	return -1; //No hay espacio libre.
+	pthread_mutex_unlock(&cerrojo);
+	return -1; // No hay asientos por reservar.
 }
 
 int libera_asiento(int id_asiento){
-	//Falla si la sala no esta creada o si el id del asiento se sale del espacio.
-	if(sala_teatro==NULL || id_asiento >= capacidad_total || id_asiento < 0) return -1;
+	// Falla si la sala no esta creada.
+	if(sala_teatro==NULL) return -1;
 	
-	pausa_aleatoria(pausa);
-
 	pthread_mutex_lock(&cerrojo);
-	//Hay asiento por lo que lo libera.
-	int id_persona = sala_teatro[id_asiento];
-	sala_teatro[id_asiento]=-1;
+	
+	// Busca un espacio ocupado.
+	for(int i = 0; i < capacidad_total; i++){
+		if(sala_teatro[i] != -1){
+			pausa_aleatoria(pausa);
+			sala_teatro[i] = -1;
+			pthread_mutex_unlock(&cerrojo);
+			return i;
+		}
+	}
 	pthread_mutex_unlock(&cerrojo);
-	return id_persona;
-
+	return -1; // No hay asientos por liberar.
 }
 
 int estado_asiento(int id_asiento){
